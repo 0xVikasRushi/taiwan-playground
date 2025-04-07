@@ -1,6 +1,5 @@
 pragma circom 2.1.6;
 
-include "es256.circom";
 include "circomlib/circuits/comparators.circom";
 
 template LocalCalculateTotal(n) {
@@ -53,6 +52,7 @@ template Matcher(maxTextLength, maxSubstringLength) {
     signal input substring[maxSubstringLength];
     signal input substringIndex;
     signal input substringLength;
+    signal input enabled;
 
     component selectors[maxSubstringLength];
     signal    textIndex[maxSubstringLength];
@@ -72,7 +72,7 @@ template Matcher(maxTextLength, maxSubstringLength) {
         selectors[i].index <== textIndex[i];
 
         eqs[i] = ForceEqualIfEnabled();
-        eqs[i].enabled <== lst[i].out; 
+        eqs[i].enabled <== lst[i].out * enabled; 
         eqs[i].in[0] <== substring[i];
         eqs[i].in[1] <== selectors[i].out; 
     }

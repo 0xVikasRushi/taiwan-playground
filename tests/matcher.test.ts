@@ -35,15 +35,15 @@ describe('Matcher Circuit', () => {
     let substr = `ipxa`; 
     
     let inputs = [];
+    inputs["enabled"] = 1n;
     inputs["text"] = string2input(text, maxTextLength);
-    console.log(inputs["text"])
     inputs["textLength"] = text.length;
     inputs["substring"]=string2input(substr,maxSubstringLength);
     inputs["substringLength"]=substr.length;
     inputs["substringIndex"]=text.indexOf(substr);
 
-    assert.ok(inputs["substringIndex"] != -1);
 
+    assert.ok(inputs["substringIndex"] != -1);
 
     console.log("Computing witness...");
     const witness = await circuit.calculateWitness(inputs);
