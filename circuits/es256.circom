@@ -10,13 +10,13 @@ include "utils/bytes.circom";
 include "utils/array.circom";
 include "ecdsa/ecdsa.circom";
 
-template JWES256Verifier(
+template ES256(
     n,
     k,
     maxMessageLength
 ) {
-    signal input message[maxMessageLength]; // JWT message (header + payload)
-    signal input messageLength; // Length of the message signed in the JWT
+    signal input message[maxMessageLength];
+    signal input messageLength; 
 
     signal input sig_r[k];
     signal input sig_s[k];
@@ -29,7 +29,7 @@ template JWES256Verifier(
     // Assert message data after messageLength are zeros
     AssertZeroPadding(maxMessageLength)(message, messageLength);
 
-    // Calculate SHA256 hash of the JWT message
+    // Calculate SHA256 hash of the message
     signal sha[256] <== Sha256Bytes(maxMessageLength)(message, messageLength);
 
       // Need to take message hash mod P, since it is an element of the base field
