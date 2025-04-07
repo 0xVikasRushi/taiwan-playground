@@ -42,7 +42,6 @@ describe('Matcher Circuit', () => {
     inputs["substringLength"]=substr.length;
     inputs["substringIndex"]=text.indexOf(substr);
 
-
     assert.ok(inputs["substringIndex"] != -1);
 
     console.log("Computing witness...");

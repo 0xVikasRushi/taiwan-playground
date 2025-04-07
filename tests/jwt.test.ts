@@ -4,6 +4,14 @@ import path from 'path';
 import { prepareES256Inputs } from '../lib/es256.ts';
 import { strict as assert } from 'assert';
 
+function string2input(s: string, padLength) {
+  let values = Array.from(s).map(char => BigInt(char.charCodeAt(0)));
+  while (values.length < padLength) {
+    values.push(0n)
+  }
+  return values;
+}
+
 describe('ES256 Verifier Circuit', () => {
   jest.setTimeout(20 * 60 * 1000); // 10 minutes
   let circuit: any;
@@ -33,15 +41,19 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE4zBhqu2TOhVW3BBZ2kYPgk5g2R8B
     // payload is
     // {"iss":"DinoChiesa.github.io","sub":"arya","aud":"kina","iat":1743682717,"exp":1843683317,"aaa":{"propX":{"aaa":"ipxamp0egcct0yf2okutj9"}}}s
 
+    const maxSubstringLength = 8;
+
     let [header, payload, signature] = token.split(".");
 
     let verifierInputs = prepareES256Inputs(Buffer.from(`${header}.${payload}`), signature, pk)
     verifierInputs["periodIndex"]=token.indexOf('.');
-    verifierInputs["matchSubstring"]=`{"aaa":"ipxamp0egcct0yf2okutj9"}`;
-    verifierInputs["matchLen"]=verifierInputs["matchSubstring"].length;
-    verifierInputs["matchIndex"]=btoa(payload).indexOf(verifierInputs["matchSubstring"]);
 
-    assert.ok(verifierInputs["matchIndex"] != -1);
+    verifierInputs["matchesCount"]=1n;
+    let substr = `ipxa`; 
+    verifierInputs["matchSubstring"]=[ string2input(substr, maxSubstringLength) ];
+    verifierInputs["matchLength"]= [ substr.length ] ;
+    verifierInputs["matchIndex"]= [ atob(payload).indexOf(substr) ];
+    assert.ok(verifierInputs["matchIndex"][0] != -1);
 
     console.log("Computing witness...");
     const witness = await circuit.calculateWitness(verifierInputs);

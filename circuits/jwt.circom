@@ -1,6 +1,7 @@
 pragma circom 2.1.6;
 
 include "es256.circom";
+include "matcher.circom";
 include "jwt_tx_builder/header-payload-extractor.circom";
 
 template JWT(
@@ -11,7 +12,9 @@ template JWT(
     maxB64HeaderLength,
     maxB64PayloadLength,
 
+    maxMatches,
     maxSubstringLength
+
 ) {
     signal input message[maxMessageLength]; // JWT message (header + payload)
     signal input messageLength; // Length of the message signed in the JWT
@@ -21,44 +24,46 @@ template JWT(
     signal input sig_s[k];
     signal input pubkey[2][k];
 
-    signal input matchSubstring[maxSubstringLength];
-    signal input matchLen;
-    signal input matchIndex;
+    signal input matchesCount;
+    signal input matchSubstring[maxMatches][maxSubstringLength];
+    signal input matchLength[maxMatches];
+    signal input matchIndex[maxMatches];
 
+/*
     component es256 = ES256(n,k,maxMessageLength);
     es256.message <== message;
     es256.messageLength <== messageLength;
     es256.sig_r <== sig_r;
     es256.sig_s <== sig_s;
     es256.pubkey <== pubkey;
+*/
 
     component extractor = HeaderPayloadExtractor(maxMessageLength,maxB64HeaderLength, maxB64PayloadLength);
     extractor.message <== message;
     extractor.messageLength <== messageLength;
     extractor.periodIndex <== periodIndex;    
 
-    component selectors[maxSubstringLength];
-    signal    selectorindex[maxSubstringLength];
+    component enableMacher[maxMatches];
+    component matcher[maxMatches];
     var       maxPayloadLength = (maxB64PayloadLength * 3) \ 4;
 
-    component lst[maxSubstringLength];
-    component eqs[maxSubstringLength];
+    for (var i=0;i<maxMatches;i++) {
+        enableMacher[i] = LessThan(8);
+        enableMacher[i].in[0] <== i;
+        enableMacher[i].in[1] <== matchesCount;
 
-    for (var i=0;i<maxSubstringLength;i++) {
-        lst[i] = LessThan(8);
-        lst[i].in[0] <== i;
-        lst[i].in[1] <== matchLen;
+        matcher[i] = Matcher(maxPayloadLength,maxSubstringLength);
+        
+        matcher[i].text <== extractor.payload;
+        matcher[i].textLength <== maxPayloadLength;
 
-        selectorindex[i] <== matchIndex+i;
+        for (k=0;k<maxSubstringLength;k++) {
+            log(matchSubstring[i][k]);
+        }
 
-        selectors[i] = QuinSelector(maxPayloadLength); 
-        selectors[i].in <== extractor.payload;
-        selectors[i].index <== selectorindex[i];
-
-        eqs[i] = ForceEqualIfEnabled();
-        eqs[i].enabled <== lst[i].out; 
-        eqs[i].in[0] <== matchSubstring[i];
-        eqs[i].in[1] <== selectors[i].out; 
+        matcher[i].substring <== matchSubstring[i];
+        matcher[i].substringIndex <== matchIndex[i];
+        matcher[i].substringLength <== matchLength[i];
+        matcher[i].enabled <== enableMacher[i].out; 
     }
-
 }
