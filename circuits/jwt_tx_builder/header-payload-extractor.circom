@@ -7,8 +7,8 @@ include "@zk-email/circuits/utils/hash.circom";
 include "@zk-email/circuits/lib/sha.circom";
 include "@zk-email/circuits/lib/rsa.circom";
 include "@zk-email/circuits/lib/base64.circom";
-include "./utils/bytes.circom";
-include "./utils/array.circom";
+include "bytes.circom";
+include "array.circom";
 
 template HeaderPayloadExtractor(
     maxMessageLength,

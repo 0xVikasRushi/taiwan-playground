@@ -67,6 +67,7 @@ export function prepareES256Inputs(message, signature, pk) {
     bufferToBigInt(y),
     1n
   );
+
   console.log("Checking the signature with library...")
   let check = p256.verify(sig.toString('hex'), Buffer.from(sha256(message)).toString('hex'), pubkey.toHex());
   assert.ok(check);
