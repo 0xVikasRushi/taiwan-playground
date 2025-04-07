@@ -1,0 +1,4 @@
+node_modules
+build
+tests/compiled-test-circuits
+ptau
