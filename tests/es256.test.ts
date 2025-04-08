@@ -40,6 +40,8 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE4zBhqu2TOhVW3BBZ2kYPgk5g2R8B
     console.log("Checking constraints...");
     await circuit.checkConstraints(witness);
 
+    console.log("ES256 Circuit verified");
+
   });
 });
 
