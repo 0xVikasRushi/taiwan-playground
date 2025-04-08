@@ -2,5 +2,35 @@
   "add": {
     "file": "add",
     "template": "Add"
+  },
+  "matcher": {
+    "file": "matcher",
+    "template": "Matcher",
+    "params": [
+      256,
+      8
+    ]
+  },
+  "es256": {
+    "file": "es256",
+    "template": "ES256",
+    "params": [
+      43,
+      6,
+      1024
+    ]
+  },
+  "jwt": {
+    "file": "jwt",
+    "template": "JWT",
+    "params": [
+      43,
+      6,
+      1024,
+      256,
+      256,
+      5,
+      8
+    ]
   }
 }

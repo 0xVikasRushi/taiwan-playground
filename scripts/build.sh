@@ -1,18 +1,41 @@
-CIRCUIT=SumProduct
+#!/bin/bash
 
-echo ${CIRCUIT_js}
-echo ${CIRCUIT}_js
+set -e
 
-rm -rf build
-mkdir build
-circom circuits/$CIRCUIT.circom --r1cs --wasm --sym -o build
-snarkjs calculatewitness --wasm "build/${CIRCUIT}_js/$CIRCUIT.wasm" --input input.json --witness build/witness.wtns
+run_circom_pipeline() {
+  local circuit=$1
+  echo "🚀 Processing circuit: $circuit"
+  npx circomkit compile "$circuit"
+  npx circomkit setup "$circuit"
+  npx circomkit prove "$circuit" default
+  npx circomkit verify "$circuit" default
+  echo "✅ Done with $circuit"
+  echo ""
+}
 
-echo "entropy\n" > build/entropy
+if [ $# -eq 0 ]; then
+  echo "Usage: bash build <matcher|es256|jwt|all>"
+  exit 1
+fi
 
-snarkjs groth16 setup build/$CIRCUIT.r1cs ptau/pot12_final.ptau build/$CIRCUIT_0000.zkey
-snarkjs zkey contribute build/$CIRCUIT_0000.zkey build/$CIRCUIT.zkey --name="1st Contributor Name" -v < build/entropy
-snarkjs zkey export verificationkey build/$CIRCUIT.zkey build/verification_key.json
-
-snarkjs groth16 prove build/SumProduct.zkey build/witness.wtns build/proof.json build/public.json
-snarkjs verify build/verification_key.json build/public.json build/proof.json
+case "$1" in
+  matcher)
+    run_circom_pipeline matcher
+    ;;
+  es256)
+    run_circom_pipeline es256
+    ;;
+  jwt)
+    run_circom_pipeline jwt
+    ;;
+  all)
+    run_circom_pipeline matcher
+    run_circom_pipeline es256
+    run_circom_pipeline jwt
+    ;;
+  *)
+    echo "❌ Unknown option: $1"
+    echo "Usage: bash build <matcher|es256|jwt|all>"
+    exit 1
+    ;;
+esac

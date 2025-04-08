@@ -1,14 +1,7 @@
 import { WitnessTester } from "circomkit";
 import { circomkit } from "./common";
 import assert from "assert";
-
-function string2input(s: string, padLength: number) {
-  let values = Array.from(s).map((char) => BigInt(char.charCodeAt(0)));
-  while (values.length < padLength) {
-    values.push(0n);
-  }
-  return values;
-}
+import { string2input } from "../src/utils";
 
 describe("Matcher Circuit", () => {
   let circuit: WitnessTester<["text", "textLength", "substring", "substringIndex", "substringLength", "enabled"], []>;
