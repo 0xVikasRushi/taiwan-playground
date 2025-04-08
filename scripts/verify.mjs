@@ -93,7 +93,7 @@ async function verify_taiwan() {
   let [h, p, s] = token.split(".") 
   const import_pk = await crypto.subtle.importKey(
     "jwk",
-    keys['keys'][1],
+    keys['keys'][0],
     {
       name: "ECDSA",
       namedCurve: "P-256"
@@ -111,8 +111,6 @@ async function verify_taiwan() {
     toByteArrayPad(s),
     Buffer.from(h + "." + p),
   );
-
-  jwt.verify(token, keys[0]);
 
   return success;
 }
