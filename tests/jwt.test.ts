@@ -12,7 +12,7 @@ describe('ES256 Verifier Circuit', () => {
 
   beforeAll(async () => {
 
-    const RECOMPILE = true;
+    const RECOMPILE = false;
 
     circuit = await wasm_tester(path.join(__dirname, './test-circuits/jwt-test.circom'), {
       recompile: RECOMPILE,
@@ -34,7 +34,7 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE4zBhqu2TOhVW3BBZ2kYPgk5g2R8B
     // {"iss":"DinoChiesa.github.io","sub":"arya","aud":"kina","iat":1743682717,"exp":1843683317,"aaa":{"propX":{"aaa":"ipxamp0egcct0yf2okutj9"}}}s
 
     const params = generateJwtCircuitParams([43,6, 1024, 256, 256, 5, 8]);
-    const inputs = generateJwtInputs(params,token, pk, ['ipxa',`"iat"`]);
+    const inputs = generateJwtInputs(params,token, {pem : pk}, ['ipxa',`"iat"`]);
 
     console.log("Computing witness...");
     const witness = await circuit.calculateWitness(inputs);

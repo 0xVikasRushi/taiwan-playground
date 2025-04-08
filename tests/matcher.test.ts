@@ -15,7 +15,7 @@ describe('Matcher Circuit', () => {
 
   beforeAll(async () => {
 
-    const RECOMPILE = true;
+    const RECOMPILE = false;
 
     circuit = await wasm_tester(path.join(__dirname, './test-circuits/matcher-test.circom'), {
       recompile: RECOMPILE,

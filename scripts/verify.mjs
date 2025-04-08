@@ -117,10 +117,22 @@ async function verify_taiwan() {
 
   let verified = false;
   for (const jwk of jku["keys"]) {
-    verified = verified || await verify_jwt(token, jwk);
+    const works =  await verify_jwt(token, jwk);
+    if (works) {
+      console.log(jwk);
+      verified = true;
+    }
   }
 
   assert.ok(verified);
+
+
+  let [h,p,s] = token.split(".");
+  console.log(token);
+  console.log("token.len=",token.length);
+  console.log("h.len", h.length);
+  console.log("p.len", p.length);
+
 }
 
 async function check_es256() {

@@ -11,7 +11,7 @@ describe('ES256 Verifier Circuit', () => {
 
   beforeAll(async () => {
 
-    const RECOMPILE = true;
+    const RECOMPILE = false;
 
     circuit = await wasm_tester(path.join(__dirname, './test-circuits/es256-test.circom'), {
       recompile: RECOMPILE,
@@ -32,7 +32,7 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE4zBhqu2TOhVW3BBZ2kYPgk5g2R8B
     let [header, payload, signature] = es256jwt.split(".");
 
     let params = generateEs256CircuitParams([43,6,1024]); 
-    let verifierInputs = generateES256Inputs(params, Buffer.from(`${header}.${payload}`), signature, pk)
+    let verifierInputs = generateES256Inputs(params, Buffer.from(`${header}.${payload}`), signature, { "pem" : pk } )
 
     console.log("Computing witness...");
     const witness = await circuit.calculateWitness(verifierInputs);

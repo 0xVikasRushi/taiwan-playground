@@ -20,11 +20,6 @@ export function generateEs256CircuitParams(params: number[]): Es256CircuitParams
   };
 }
 
-
-function uint8ArrayToBigInt(x: Uint8Array): bigint {
-  return BigInt('0x' + Buffer.from(x).toString('hex'));
-}
-
 function bigint_to_registers(x: bigint, n: number, k: number): bigint[] {
   let mod: bigint = 1n;
   for (var idx = 0; idx < n; idx++) {
@@ -55,7 +50,7 @@ function get_x_y_from_pk(pk) {
   const x = xy.subarray(0, 32);
   const y = xy.subarray(32);
 
-  return [x, y]
+  return [bufferToBigInt(x), bufferToBigInt(y)]
 }
 
 function bufferToBigInt(buffer) {
@@ -63,33 +58,57 @@ function bufferToBigInt(buffer) {
   return BigInt('0x' + buffer.toString('hex'));
 }
 
-export function generateES256Inputs(params: Es256CircuitParams, message: string, signature : string, pk: string) {
+export interface JwkEcdsaPublicKey {
+  kty: string,
+  crv: string,
+  kid?: string,
+  x: string,
+  y: string
+}
+
+export interface PemPublicKey {
+  pem: string,
+}
+
+function base64ToBigInt(base64Str) {
+  const buffer = Buffer.from(base64Str, 'base64');
+  const hex = buffer.toString('hex');
+  return BigInt('0x' + hex);
+}
+
+export function generateES256Inputs(params: Es256CircuitParams, message: string, b64Signature : string, pk: JwkEcdsaPublicKey | PemPublicKey) {
   assert.ok(message.length <= params.maxMessageLength);
-  
-  let sig = Buffer.from(signature, "base64url");
+
+  // decode signature
+  let sig = Buffer.from(b64Signature, "base64url");
   let sig_decoded = p256.Signature.fromCompact(sig.toString('hex'));
   let sig_r = bigint_to_registers(sig_decoded.r, 43, 6);
   let sig_s = bigint_to_registers(sig_decoded.s, 43, 6);
 
-  let pk1 = pk.replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "").replaceAll("\n", "");
-  let [x, y] = get_x_y_from_pk(pk1);
-  let pubkey = new p256.ProjectivePoint(
-    bufferToBigInt(x),
-    bufferToBigInt(y),
-    1n
-  );
+  // decode public key  
+  let x,y;
+  if ('pem' in pk) {
+    let pk1 = pk.pem.replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "").replaceAll("\n", "");
+    [x, y] = get_x_y_from_pk(pk1);  
+  } else {
+    assert.ok(pk.kty == 'EC');
+    assert.ok(pk.crv == 'P-256');
+    [x,y] = [base64ToBigInt(pk.x), base64ToBigInt(pk.y)]
+  }
 
-  console.log("Checking the signature with library...")
+  // internal check
+  let pubkey = new p256.ProjectivePoint(x,y,1n);
   let check = p256.verify(sig.toString('hex'), Buffer.from(sha256(message)).toString('hex'), pubkey.toHex());
   assert.ok(check);
 
-  let [pb_x, pb_y] = [bufferToBigInt(x), bufferToBigInt(y)];
-  let [messagePadded, messagePaddedLen] = sha256Pad(message, MAX_JWT_PADDED_BYTES);
+  // generate padded message
+  let [messagePadded, messagePaddedLen] = sha256Pad(message, params.maxMessageLength);
 
+  // return inputs
   return {
     sig_r: sig_r,
     sig_s: sig_s,
-    pubkey: [bigint_to_registers(pb_x, 43, 6), bigint_to_registers(pb_y, 43, 6)],
+    pubkey: [bigint_to_registers(x, 43, 6), bigint_to_registers(y, 43, 6)],
     message: Uint8ArrayToCharArray(messagePadded),
     messageLength: messagePaddedLen.toString(),
   }
