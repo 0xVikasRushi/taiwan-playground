@@ -1,6 +1,8 @@
 # taiwan
 
-- install circom // must be 2.1.6 !
+- install circom
+  - Works with 2.2.1
+  - Circom 2.2.2 panics https://github.com/iden3/circom/issues/359
 - npm install -g snarkjs@latest
 - npm test
 
