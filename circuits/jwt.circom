@@ -35,27 +35,27 @@ template JWT(
     es256.sig_s <== sig_s;
     es256.pubkey <== pubkey;
 
-    component extractor = HeaderPayloadExtractor(maxMessageLength,maxB64HeaderLength, maxB64PayloadLength);
-    extractor.message <== message;
-    extractor.messageLength <== messageLength;
-    extractor.periodIndex <== periodIndex;    
+    // component extractor = HeaderPayloadExtractor(maxMessageLength,maxB64HeaderLength, maxB64PayloadLength);
+    // extractor.message <== message;
+    // extractor.messageLength <== messageLength;
+    // extractor.periodIndex <== periodIndex;    
 
-    component enableMacher[maxMatches];
-    component matcher[maxMatches];
-    var       maxPayloadLength = (maxB64PayloadLength * 3) \ 4;
+    // component enableMacher[maxMatches];
+    // component matcher[maxMatches];
+    // var       maxPayloadLength = (maxB64PayloadLength * 3) \ 4;
 
-    for (var i=0;i<maxMatches;i++) {
-        enableMacher[i] = LessThan(8);
-        enableMacher[i].in[0] <== i;
-        enableMacher[i].in[1] <== matchesCount;
+    // for (var i=0;i<maxMatches;i++) {
+    //     enableMacher[i] = LessThan(8);
+    //     enableMacher[i].in[0] <== i;
+    //     enableMacher[i].in[1] <== matchesCount;
 
-        matcher[i] = Matcher(maxPayloadLength,maxSubstringLength);
+    //     matcher[i] = Matcher(maxPayloadLength,maxSubstringLength);
         
-        matcher[i].text <== extractor.payload;
-        matcher[i].textLength <== maxPayloadLength;
-        matcher[i].substring <== matchSubstring[i];
-        matcher[i].substringIndex <== matchIndex[i];
-        matcher[i].substringLength <== matchLength[i];
-        matcher[i].enabled <== enableMacher[i].out; 
-    }
+    //     matcher[i].text <== extractor.payload;
+    //     matcher[i].textLength <== maxPayloadLength;
+    //     matcher[i].substring <== matchSubstring[i];
+    //     matcher[i].substringIndex <== matchIndex[i];
+    //     matcher[i].substringLength <== matchLength[i];
+    //     matcher[i].enabled <== enableMacher[i].out; 
+    // }
 }
