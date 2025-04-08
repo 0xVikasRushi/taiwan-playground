@@ -1,5 +1,5 @@
 import { strict as assert } from "assert";
-import { generateES256Inputs, Es256CircuitParams } from "./es256";
+import { generateES256Inputs, Es256CircuitParams, JwkEcdsaPublicKey, PemPublicKey } from "./es256";
 
 interface JwtCircuitParams {
   es256: Es256CircuitParams;
@@ -31,7 +31,12 @@ function string2input(s: string, padLength: number): bigint[] {
   return values;
 }
 
-export function generateJwtInputs(params: JwtCircuitParams, token: string, pk: string, matches: string[]) {
+export function generateJwtInputs(
+  params: JwtCircuitParams,
+  token: string,
+  pk: JwkEcdsaPublicKey | PemPublicKey,
+  matches: string[]
+) {
   const [b64header, b64payload, b64signature] = token.split(".");
   assert.ok(b64header.length <= params.maxB64HeaderLength);
   assert.ok(b64payload.length <= params.maxB64PayloadLength);

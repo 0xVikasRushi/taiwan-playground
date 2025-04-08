@@ -18,10 +18,12 @@ describe("Matcher Circuit", () => {
 
   describe("Match test", () => {
     before(async () => {
+      const RECOMPILE = true;
       circuit = await circomkit.WitnessTester(`Matcher`, {
         file: "matcher",
         template: "Matcher",
         params: [maxTextLength, maxSubstringLength],
+        recompile: RECOMPILE,
       });
       console.log("#constraints:", await circuit.getConstraintCount());
     });
@@ -40,7 +42,10 @@ describe("Matcher Circuit", () => {
 
       assert(inputs["substringIndex"] != -1);
 
+      console.log("Computing witness...");
       const witness = await circuit.calculateWitness(inputs);
+
+      console.log("Checking constraints...");
       await circuit.expectConstraintPass(witness);
     });
   });

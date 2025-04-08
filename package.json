@@ -6,6 +6,7 @@
     "compile:test": "npx circomkit compile add && npx circomkit prove add default && npx circomkit verify add default"
   },
   "dependencies": {
+    "@aws-crypto/sha256-js": "^5.2.0",
     "@noble/curves": "^1.8.1",
     "@noble/hashes": "^1.7.1",
     "@types/asn1": "^0.2.4",
@@ -15,7 +16,16 @@
     "base64-js": "^1.5.1",
     "bs58": "^6.0.0",
     "circomkit": "^0.3.2",
-    "circomlib": "^2.0.5"
+    "circomlib": "^2.0.5",
+    "circom_tester": "^0.0.21",
+    "did-resolver": "^4.1.0",
+    "jose": "^6.0.10",
+    "jsonwebtoken": "^9.0.2",
+    "jwk-to-pem": "^2.0.7",
+    "jws": "^4.0.0",
+    "key-did-resolver": "^4.0.0",
+    "mocha": "^11.1.0",
+    "safe-buffer": "^5.2.1"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.1",

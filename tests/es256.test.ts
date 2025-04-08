@@ -7,10 +7,12 @@ describe("ES256 Verifier Circuit", () => {
 
   describe("ES256 Circuit", () => {
     before(async () => {
+      const RECOMPILE = true;
       circuit = await circomkit.WitnessTester(`ES256`, {
         file: "es256",
         template: "ES256",
         params: [43, 6, 1024],
+        recompile: RECOMPILE,
       });
       console.log("#constraints:", await circuit.getConstraintCount());
     });
@@ -26,7 +28,9 @@ describe("ES256 Verifier Circuit", () => {
       let [header, payload, signature] = es256jwt.split(".");
 
       let params = generateEs256CircuitParams([43, 6, 1024]);
-      let verifierInputs = generateES256Inputs(params, Buffer.from(`${header}.${payload}`), signature, pk);
+      let verifierInputs = generateES256Inputs(params, Buffer.from(`${header}.${payload}`), signature, { pem: pk });
+
+      console.log("Computing witness...");
       let witness = await circuit.calculateWitness(verifierInputs);
 
       console.log("Checking constraints...");
