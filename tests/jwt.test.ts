@@ -4,7 +4,6 @@ import path from 'path';
 import { generateJwtCircuitParams, generateJwtInputs } from '../lib/jwt.ts';
 import { strict as assert } from 'assert';
 
-
 describe('ES256 Verifier Circuit', () => {
   jest.setTimeout(20 * 60 * 1000); // 10 minutes
   let circuit: any;
