@@ -51,5 +51,4 @@ template ES256(
     ecdsa.s <== sig_s;
     ecdsa.msghash <== message_hash_mod_p;
     ecdsa.pubkey <== pubkey;
-
 }

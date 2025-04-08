@@ -23,6 +23,7 @@
     "@babel/preset-env": "^7.22.20",
     "@babel/preset-typescript": "^7.23.0",
     "@types/jest": "^29.5.4",
+    "@types/node": "^22.14.0",
     "chai": "^4.3.7",
     "circom_tester": "^0.0.19",
     "circomlib": "^2.0.5",

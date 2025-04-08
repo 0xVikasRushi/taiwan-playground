@@ -1,7 +1,7 @@
-timport { wasm as wasm_tester } from 'circom_tester';
+import { wasm as wasm_tester } from 'circom_tester';
 import path from 'path';
 
-import { prepareES256Inputs } from '../lib/es256.ts';
+import { generateES256Inputs, generateEs256CircuitParams } from '../lib/es256.ts';
 
 describe('ES256 Verifier Circuit', () => {
   jest.setTimeout(20 * 60 * 1000); // 10 minutes
@@ -31,7 +31,8 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE4zBhqu2TOhVW3BBZ2kYPgk5g2R8B
 
     let [header, payload, signature] = es256jwt.split(".");
 
-    let verifierInputs = prepareES256Inputs(Buffer.from(`${header}.${payload}`), signature, pk)
+    let params = generateEs256CircuitParams([43,6,1024]); 
+    let verifierInputs = generateES256Inputs(params, Buffer.from(`${header}.${payload}`), signature, pk)
 
     console.log("Computing witness...");
     const witness = await circuit.calculateWitness(verifierInputs);

@@ -14,7 +14,6 @@ template JWT(
 
     maxMatches,
     maxSubstringLength
-
 ) {
     signal input message[maxMessageLength]; // JWT message (header + payload)
     signal input messageLength; // Length of the message signed in the JWT
@@ -29,14 +28,12 @@ template JWT(
     signal input matchLength[maxMatches];
     signal input matchIndex[maxMatches];
 
-/*
     component es256 = ES256(n,k,maxMessageLength);
     es256.message <== message;
     es256.messageLength <== messageLength;
     es256.sig_r <== sig_r;
     es256.sig_s <== sig_s;
     es256.pubkey <== pubkey;
-*/
 
     component extractor = HeaderPayloadExtractor(maxMessageLength,maxB64HeaderLength, maxB64PayloadLength);
     extractor.message <== message;
@@ -56,11 +53,6 @@ template JWT(
         
         matcher[i].text <== extractor.payload;
         matcher[i].textLength <== maxPayloadLength;
-
-        for (k=0;k<maxSubstringLength;k++) {
-            log(matchSubstring[i][k]);
-        }
-
         matcher[i].substring <== matchSubstring[i];
         matcher[i].substringIndex <== matchIndex[i];
         matcher[i].substringLength <== matchLength[i];

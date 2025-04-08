@@ -6,11 +6,26 @@ import { sha256 } from '@noble/hashes/sha256';
 export const MAX_JWT_PADDED_BYTES = 1024;
 import { strict as assert } from 'assert';
 
-export function uint8ArrayToBigInt(x: Uint8Array): bigint {
+export interface Es256CircuitParams {
+  n: number,
+  k: number,
+  maxMessageLength: number
+}
+
+export function generateEs256CircuitParams(params: number[]): Es256CircuitParams {
+  return {
+    n: params[0],
+    k: params[1],
+    maxMessageLength: params[2],
+  };
+}
+
+
+function uint8ArrayToBigInt(x: Uint8Array): bigint {
   return BigInt('0x' + Buffer.from(x).toString('hex'));
 }
 
-export function bigint_to_registers(x: bigint, n: number, k: number): bigint[] {
+function bigint_to_registers(x: bigint, n: number, k: number): bigint[] {
   let mod: bigint = 1n;
   for (var idx = 0; idx < n; idx++) {
     mod = mod * 2n;
@@ -25,12 +40,6 @@ export function bigint_to_registers(x: bigint, n: number, k: number): bigint[] {
   return ret;
 }
 
-function toByteArrayPad(s) {
-  while (s.length % 4 != 0) {
-    s = s + "=";
-  }
-  return toByteArray(s);
-}
 function get_x_y_from_pk(pk) {
   var pk1 = toByteArray(pk);
   var reader = new Ber.Reader(Buffer.from(pk1));
@@ -54,7 +63,9 @@ function bufferToBigInt(buffer) {
   return BigInt('0x' + buffer.toString('hex'));
 }
 
-export function prepareES256Inputs(message, signature, pk) {
+export function generateES256Inputs(params: Es256CircuitParams, message: string, signature : string, pk: string) {
+  assert.ok(message.length <= params.maxMessageLength);
+  
   let sig = Buffer.from(signature, "base64url");
   let sig_decoded = p256.Signature.fromCompact(sig.toString('hex'));
   let sig_r = bigint_to_registers(sig_decoded.r, 43, 6);
