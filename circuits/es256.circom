@@ -20,6 +20,8 @@ template ES256(
     signal input sig_s[k];
     signal input pubkey[2][k];
 
+    signal output sha[256];
+
     // Assert message length fits in ceil(log2(maxMessageLength))
     component n2bMessageLength = Num2Bits(log2Ceil(maxMessageLength));
     n2bMessageLength.in <== messageLength;
@@ -28,7 +30,7 @@ template ES256(
     AssertZeroPadding(maxMessageLength)(message, messageLength);
 
     // Calculate SHA256 hash of the message
-    signal sha[256] <== Sha256Bytes(maxMessageLength)(message, messageLength);
+    sha <== Sha256Bytes(maxMessageLength)(message, messageLength);
 
       // Need to take message hash mod P, since it is an element of the base field
     var ret[100] = get_p256_prime(n, k);

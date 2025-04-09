@@ -1,5 +1,5 @@
 {
-  "description": "taiwan",
+  "description": "seediq",
   "scripts": {
     "start": "npx ts-node ./src/index.ts",
     "test": "NODE_OPTIONS=--max-old-space-size=4096 npx mocha --timeout 900000",

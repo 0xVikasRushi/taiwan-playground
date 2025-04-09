@@ -12,7 +12,6 @@ yarn
 
 ## Circuits
 
-- `matcher` – Substring matcher circuit
 - `es256` – ECDSA signature verification (ES256)
 - `jwt` – JWT validation circuit
 
@@ -31,8 +30,6 @@ yarn test
 The project includes build scripts for each circuit:
 
 ```
-bash scripts/build matcher # Runs full flow for matcher.circom
-bash scripts/build es256 # Runs full flow for es256.circom
 bash scripts/build jwt # Runs full flow for jwt.circom
 bash scripts/build all # Runs all circuits
 ```

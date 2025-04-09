@@ -1,8 +1,8 @@
 pragma circom 2.1.6;
 
 include "es256.circom";
-include "matcher.circom";
 include "jwt_tx_builder/header-payload-extractor.circom";
+include "keyless_zk_proofs/arrays.circom";
 
 template JWT(
     n,
@@ -35,27 +35,27 @@ template JWT(
     es256.sig_s <== sig_s;
     es256.pubkey <== pubkey;
 
-    // component extractor = HeaderPayloadExtractor(maxMessageLength,maxB64HeaderLength, maxB64PayloadLength);
-    // extractor.message <== message;
-    // extractor.messageLength <== messageLength;
-    // extractor.periodIndex <== periodIndex;    
+    component extractor = HeaderPayloadExtractor(maxMessageLength,maxB64HeaderLength, maxB64PayloadLength);
+    extractor.message <== message;
+    extractor.messageLength <== messageLength;
+    extractor.periodIndex <== periodIndex;    
 
-    // component enableMacher[maxMatches];
-    // component matcher[maxMatches];
-    // var       maxPayloadLength = (maxB64PayloadLength * 3) \ 4;
+    component enableMacher[maxMatches];
+    component matcher[maxMatches];
+    var       maxPayloadLength = (maxB64PayloadLength * 3) \ 4;
 
-    // for (var i=0;i<maxMatches;i++) {
-    //     enableMacher[i] = LessThan(8);
-    //     enableMacher[i].in[0] <== i;
-    //     enableMacher[i].in[1] <== matchesCount;
+    for (var i=0;i<maxMatches;i++) {
+        enableMacher[i] = LessThan(8);
+        enableMacher[i].in[0] <== i;
+        enableMacher[i].in[1] <== matchesCount;
 
-    //     matcher[i] = Matcher(maxPayloadLength,maxSubstringLength);
-        
-    //     matcher[i].text <== extractor.payload;
-    //     matcher[i].textLength <== maxPayloadLength;
-    //     matcher[i].substring <== matchSubstring[i];
-    //     matcher[i].substringIndex <== matchIndex[i];
-    //     matcher[i].substringLength <== matchLength[i];
-    //     matcher[i].enabled <== enableMacher[i].out; 
-    // }
+        matcher[i] = CheckSubstrInclusionPoly(maxPayloadLength,maxSubstringLength);
+        matcher[i].str <== extractor.payload;
+        matcher[i].str_hash <== 81283812381238128;
+        matcher[i].substr <== matchSubstring[i];
+        matcher[i].substr_len <== matchLength[i];
+        matcher[i].start_index <== matchIndex[i];
+        matcher[i].enabled <== enableMacher[i].out;
+
+    }
 }
